@@ -4,6 +4,14 @@ _version="0.1.0"
 nvims_dirname='nvims'  #default setups directory name
 nvims_dirpath="$HOME/.config/$nvims_dirname"
 default=false
+has_nerd_fonts=true #default to true, if you don't have nerd fonts, set to false
+#prompt
+if [ "$has_nerd_fonts" = true ]; then
+    picker_prompt="Select a  setup > "
+else
+    picker_prompt="Select a setup > "
+fi
+
 usage() {
 cat <<EOF
 Usage: nvims [setup_name]
@@ -21,7 +29,7 @@ an init.lua file is considered a setup.
 EOF
 }
 
-# generate a list of avail`able setups by checking
+# generate a list of available setups by checking
 # directories in nvims_dirpath containing init.lua file
 # and add the directory name to the array
 setups=() # array to store available setups
@@ -31,31 +39,35 @@ for setup in $nvims_dirpath/*; do
         setups+=("$setup_name")
     fi
 done
+# prints a list of available setups
 list_setups() {
     echo "Available setups:"
     for setup in "${setups[@]}"; do
         echo "  $setup"
     done
 }
-# if there are no setups, print an error message and exit
+# if the directory does not exist, print a message and exit
 if [ ! -d "$nvims_dirpath" ]; then
     echo "Directory $nvims_dirpath does not exist."
     echo "To use nvims, create the directory and add setups to it."
+    usage
     exit 1
 fi
 
+# if no setups are found, print a message and exit
 if [ ${#setups[@]} -eq 0 ]; then
     echo "No setups found in $nvims_dirpath."
+    usage
     exit 1
 fi
 
 # if no argument is provided, let user choose a setup using select if fzf is not installed
 if [ -z "$1" ]; then
-    if command -v fzf &> /dev/null; then
+    if command -v fzf &> /dev/null; then  #use fzf for fuzzy search
         setup_name=$(printf "%s\n" "${setups[@]}" | \
-        fzf)
-    else
-        echo "Available setups:"
+        fzf --prompt="$picker_prompt" --height=10 --reverse --border --cycle)
+    else #use select for simple selection    
+        echo "$picker_prompt"
         select setup_name in "${setups[@]}"; do
             break
         done
