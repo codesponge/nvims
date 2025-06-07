@@ -1,7 +1,6 @@
 # NVIMS
 
-`nvims` is a script to switch between different Neovim configurations.
-on a linux system. 
+`nvims` is a script to switch between different Neovim configurations on a linux(ish) system. 
 Each configuration is referred to as a 'setup' and is located in 
 the `~/.config/nvims/` directory. 
 Any directory in `~/.config/nvims/` containing 
